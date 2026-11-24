@@ -1,0 +1,13 @@
+{
+  "name": "analizador-imagenes-ia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Analiza hasta 9 imagenes juntas con la API de Gemini a partir de un pedido escrito.",
+  "type": "module",
+  "engines": { "node": ">=21.7" },
+  "scripts": {
+    "start": "node server.js",
+    "demo": "node scripts/demo.js",
+    "test": "node --test \"pruebas/*.test.mjs\""
+  }
+}

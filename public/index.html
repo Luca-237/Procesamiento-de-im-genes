@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analizador de imágenes IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css?v=20261124.1">
+</head>
+<body>
+  <header class="barra">
+    <div class="marca">
+      <span class="isotipo" aria-hidden="true">C</span>
+      <span>
+        <span class="titulo">Analizador de imágenes</span>
+        <span class="sub">Hasta 9 fotos, una sola conclusión</span>
+      </span>
+    </div>
+    <label class="campo-modelo">
+      <span>Modelo</span>
+      <select id="modelo" aria-label="Modelo de IA"></select>
+    </label>
+  </header>
+
+  <div id="aviso-key" class="aviso" hidden>
+    <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+    <span>Falta la API key de Gemini. Cargala en el archivo <code>.env</code> de la carpeta del programa (ver <code>LEEME.md</code>) y reiniciá el programa.</span>
+  </div>
+
+  <main class="contenido">
+    <section class="tarjeta" aria-labelledby="t-imagenes">
+      <div class="tarjeta-cab">
+        <h2 id="t-imagenes">Imágenes <span id="contador" class="contador">0 / 9</span></h2>
+        <div class="acciones">
+          <button type="button" id="btn-descargar" class="btn btn-sec" disabled>
+            <svg class="ico" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            <span>Descargar collage</span>
+          </button>
+          <button type="button" id="btn-vaciar" class="btn btn-sec" disabled>
+            <svg class="ico" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2"/></svg>
+            <span>Vaciar</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="collage" class="collage" data-cant="0"></div>
+
+      <label id="zona" class="zona" tabindex="0">
+        <input id="archivo" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/avif" multiple hidden>
+        <svg class="ico ico-grande" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+        <span class="zona-titulo">Arrastrá las fotos acá o hacé clic para elegirlas</span>
+        <span class="zona-sub">También podés pegarlas con Ctrl+V. JPG, PNG, WEBP, GIF o AVIF.</span>
+      </label>
+      <p class="ayuda">Arrastrá una foto sobre otra para cambiar el orden. La IA recibe cada foto por separado, numerada, y las analiza juntas.</p>
+    </section>
+
+    <section class="tarjeta" aria-labelledby="t-pedido">
+      <h2 id="t-pedido">¿Qué querés saber?</h2>
+      <div class="ejemplos" id="ejemplos">
+        <button type="button" class="chip" data-texto="Compará estas fotos y decime en qué se diferencian y en qué se parecen.">Comparar</button>
+        <button type="button" class="chip" data-texto="¿Todas las fotos muestran el mismo producto? Si alguna es de otro producto, decime cuál y por qué.">Mismo producto</button>
+        <button type="button" class="chip" data-texto="Describí el producto que se ve en las fotos para publicarlo en la tienda online: tipo de producto, materiales, colores, medidas aproximadas en centímetros y detalles.">Descripción para la web</button>
+        <button type="button" class="chip" data-texto="Revisá la calidad de cada foto (enfoque, luz, fondo, encuadre) y decime cuáles sirven para la tienda y cuáles conviene volver a sacar.">Calidad de las fotos</button>
+        <button type="button" class="chip" data-texto="Leé todos los textos, códigos y etiquetas visibles en las fotos y armá una lista por imagen.">Leer textos y códigos</button>
+      </div>
+      <textarea id="prompt" rows="5" maxlength="8000" placeholder="Ej.: Mirá las 9 fotos y decime cuántas variantes de color hay de esta mochila y cuál falta fotografiar de espalda."></textarea>
+      <div class="pie-pedido">
+        <span class="ayuda">Ctrl+Enter para enviar</span>
+        <button type="button" id="btn-analizar" class="btn btn-pri" disabled>
+          <svg class="ico" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+          <span>Analizar</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="resultado" class="tarjeta" aria-live="polite" hidden>
+      <div class="tarjeta-cab">
+        <h2>Conclusión</h2>
+        <button type="button" id="btn-copiar" class="btn btn-sec" hidden>
+          <svg class="ico" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+          <span>Copiar</span>
+        </button>
+      </div>
+      <div id="cargando" class="cargando" hidden>
+        <svg class="ico giro" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+        <span>Analizando las imágenes…</span>
+      </div>
+      <div id="error" class="error" role="alert" hidden></div>
+      <div id="respuesta" class="respuesta"></div>
+      <p id="meta" class="meta"></p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script src="app.js?v=20261124.1"></script>
+</body>
+</html>
